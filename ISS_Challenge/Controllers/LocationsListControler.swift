@@ -14,6 +14,10 @@ class LocationsListController: UIViewController, UITableViewDelegate, UITableVie
     let _locationManager = CLLocationManager();
     var _currentLocation : CLLocation? = CLLocation(latitude: 0,longitude: 0);
     var _locationType: NewLocationType = NewLocationType.Coordinates;
+    
+    var locations = [Passover]();
+    
+    let formatter : NSDateFormatter = NSDateFormatter();
 
     //MARK: Outlets
 
@@ -23,6 +27,8 @@ class LocationsListController: UIViewController, UITableViewDelegate, UITableVie
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        formatter.dateFormat = "MM/dd/yyyy hh:mm:ss a";
 
         _locationManager.requestWhenInUseAuthorization();
         _locationManager.delegate = self
@@ -69,8 +75,14 @@ class LocationsListController: UIViewController, UITableViewDelegate, UITableVie
             return nil;
         }
     }
+    
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 1;
+        if(_currentLocation != nil && section == 0){
+            return 1;
+        }
+        else {
+            return locations.count;
+        }
     }
 
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
@@ -85,7 +97,12 @@ class LocationsListController: UIViewController, UITableViewDelegate, UITableVie
             //TODO: Passover date;
         }
         else{
-            //Friend
+            let passover = locations[indexPath.row];
+            cell!.textLabel!.text = passover.name;
+            
+            if(passover.date != nil){
+                cell!.detailTextLabel!.text = formatter.stringFromDate(passover.date!);
+            }
         }
 
         return cell!;
@@ -111,7 +128,24 @@ class LocationsListController: UIViewController, UITableViewDelegate, UITableVie
     //MARK: New Location Delegate
 
     func savedLocation(passover: Passover) {
-
+        self.navigationController?.popViewControllerAnimated(true);
+        
+        locations.append(passover)
+        
+        let indexSet = NSMutableIndexSet();
+        
+        if(_currentLocation != nil){
+            indexSet.addIndex(1);
+        }
+        else {
+            indexSet.addIndex(0);
+        }
+        
+        _locationsTableView.beginUpdates();
+        _locationsTableView.reloadSections(indexSet, withRowAnimation: UITableViewRowAnimation.Automatic);
+        _locationsTableView.endUpdates();
+        
+        Passover.savePassovers(locations);
     }
 
     //MARK: Actions
@@ -121,18 +155,24 @@ class LocationsListController: UIViewController, UITableViewDelegate, UITableVie
             (alert: UIAlertAction!) in
 
             self._locationType = NewLocationType.Coordinates;
+            
+            self.performSegueWithIdentifier("NewSegue", sender: self);
         })
 
         let addressAction = UIAlertAction(title: "Address", style: UIAlertActionStyle.Default, handler: {
             (alert: UIAlertAction!) in
 
             self._locationType = NewLocationType.Address;
+            
+            self.performSegueWithIdentifier("NewSegue", sender: self);
         })
 
         let mapAction = UIAlertAction(title: "Map", style: UIAlertActionStyle.Default, handler: {
             (alert: UIAlertAction!) in
 
             self._locationType = NewLocationType.Map;
+            
+            self.performSegueWithIdentifier("NewSegue", sender: self);
         })
 
         let newLocationSheet = UIAlertController(title: "Create Using:", message: nil, preferredStyle: UIAlertControllerStyle.ActionSheet);

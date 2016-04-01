@@ -13,9 +13,12 @@ private let name_key : String = "name";
 private let location_latitude_key : String = "location_lat";
 private let location_longitude_key : String = "location_lng";
 private let date_key : String = "date";
+private let id_key : String = "id";
 
 class Passover : NSObject {
 
+    //MARK: Properties
+    
     var name : String? {
         get{
             return dataDictionary[name_key] as? String;
@@ -57,7 +60,7 @@ class Passover : NSObject {
                 return NSDate(timeIntervalSinceReferenceDate: timeStamp);
             }
             else{
-                return NSDate(timeIntervalSinceReferenceDate: 0);
+                return nil;
             }
         }
 
@@ -67,7 +70,43 @@ class Passover : NSObject {
             }
         }
     }
+    
+    var id : Int? {
+        get {
+            return dataDictionary[id_key] as? Int;
+        }
+        set {
+            dataDictionary[id_key] = newValue;
+        }
+    }
 
+    //MARK: Members
 
     private var dataDictionary = Dictionary<String,AnyObject>();
+    
+    //MARK: Initializers
+    
+    override init(){
+        super.init();
+    }
+    
+    init(withName name: String, location: CLLocation?){
+        super.init();
+        
+        self.name = name;
+        self.location = location;
+    }
+    
+    //MARK: Static Methods
+    
+    static func savePassovers(passovers: [Passover]?){
+//        let defaults = NSUserDefaults.standardUserDefaults();
+//        defaults.setObject(passovers, forKey: "passovers");
+//        defaults.synchronize();
+    }
+    
+    static func getPassovers() -> [Passover]?{
+        let defaults = NSUserDefaults.standardUserDefaults();
+        return defaults.objectForKey("passovers") as? [Passover];
+    }
 }

@@ -26,32 +26,12 @@ class NewLocationController : UIViewController, MKMapViewDelegate {
     
     var delegate : NewLocationDelegate?;
 
-    var selectedLocation : CLLocation = CLLocation(latitude: 0, longitude: 0);
-
-    private var _locationType: NewLocationType = NewLocationType.Coordinates;
-    var locationType: NewLocationType {
-        get {
-            return _locationType;
-        }
-        set {
-            _locationType = newValue;
-
-            coordinatesLabel.hidden = (_locationType != NewLocationType.Coordinates);
-            latitudeField.hidden = (_locationType != NewLocationType.Coordinates);
-            longitudeField.hidden = (_locationType != NewLocationType.Coordinates);
-
-            addressLabel.hidden = (_locationType != NewLocationType.Address);
-            addressField.hidden = (_locationType != NewLocationType.Address);
-
-            mapLabel.hidden = (_locationType != NewLocationType.Map);
-            mapView.hidden = (_locationType != NewLocationType.Map);
-        }
-    }
+    var locationType: NewLocationType = NewLocationType.Coordinates;
 
     //MARK: Outlets
 
-    @IBOutlet var nameLavel : UILabel!;
-    @IBOutlet var nameField : UIField!;
+    @IBOutlet var nameLabel : UILabel!;
+    @IBOutlet var nameField : UITextField!;
     
     @IBOutlet var coordinatesLabel: UILabel!;
     @IBOutlet var latitudeField: UITextField!;
@@ -63,17 +43,31 @@ class NewLocationController : UIViewController, MKMapViewDelegate {
     @IBOutlet var mapLabel: UILabel!;
     @IBOutlet var mapView: MKMapView!;
 
+    private var selectedLocation : CLLocation = CLLocation(latitude: 0, longitude: 0);
+    private var tappedLocation : MKPointAnnotation? = nil;
+
+
     //MARK: Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        self.title = "Locations";
 
-        if(_locationType == NewLocationType.Map){
+        coordinatesLabel.hidden = (locationType != NewLocationType.Coordinates);
+        latitudeField.hidden = (locationType != NewLocationType.Coordinates);
+        longitudeField.hidden = (locationType != NewLocationType.Coordinates);
+
+        addressLabel.hidden = (locationType != NewLocationType.Address);
+        addressField.hidden = (locationType != NewLocationType.Address);
+
+        mapLabel.hidden = (locationType != NewLocationType.Map);
+        mapView.hidden = (locationType != NewLocationType.Map);
+
+        if(locationType == NewLocationType.Map){
             let mapTapRecog = UITapGestureRecognizer(target: self, action: #selector(self.handleMapTap(_:)));
             mapView.addGestureRecognizer(mapTapRecog);
         }
-        
-        self.title = "Locations";
     }
     
     override func didReceiveMemoryWarning() {
@@ -85,16 +79,84 @@ class NewLocationController : UIViewController, MKMapViewDelegate {
 
     //MARK: Actions
     
-    @IBAction func save(sender: UIButton) {
-
-    }
-    
     func handleMapTap(recognizer: UITapGestureRecognizer) {
         let tapLocation = recognizer.locationInView(mapView);
         let tapCoordinates = mapView.convertPoint(tapLocation, toCoordinateFromView: mapView);
         
+        let location = CLLocation.init(latitude: tapCoordinates.latitude, longitude: tapCoordinates.longitude);
+        
+        if(tappedLocation != nil){
+            mapView.removeAnnotation(tappedLocation!);
+        }
+        
+        tappedLocation = MKPointAnnotation();
+        tappedLocation!.coordinate = location.coordinate;
+        mapView.addAnnotation(tappedLocation!);
+        
+        selectedLocation = location;
+    }
+    
+    @IBAction func save(sender: UIButton) {
+        if(nameField.text != nil){
+            if(locationType == NewLocationType.Coordinates) {
+                saveCoordinates();
+            }
+            else if(locationType == NewLocationType.Address) {
+                saveAddress();
+            }
+            else if(locationType == NewLocationType.Map) {
+                saveMap();
+            }
+        }
+    }
+    
+    func saveCoordinates(){
+        if(latitudeField.text != nil && longitudeField.text != nil){
+            let latitude = Double(latitudeField.text!);
+            let longitude = Double(longitudeField.text!);
+            
+            if(latitude != nil && longitude != nil){
+                let name = nameField.text!;
+                let location = CLLocation(latitude: latitude!, longitude: longitude!);
+                
+                let passover = Passover(withName: name, location: location)
+                
+                sendToDelegate(passover);
+            }
+        }
+    }
+    
+    func saveAddress() {
+        if let address = addressField.text {
+            CLGeocoder().geocodeAddressString(address, completionHandler: {
+                (placemarks: [CLPlacemark]?, error: NSError?) -> Void in
+                
+                if(error == nil && placemarks != nil && placemarks?.count > 0){
+                    let placemark = placemarks![0];
+                    
+                    let name = self.nameField.text!;
+                    let passover = Passover(withName: name, location: placemark.location);
+                    
+                    self.sendToDelegate(passover);
+                }
+                else{
+                    //TODO: No Address Matched
+                }
+            })
+        }
+    }
+    
+    func saveMap(){
+        let name = nameField.text!;
+        
+        let passover = Passover(withName: name, location: selectedLocation);
+        
+        sendToDelegate(passover);
+    }
+    
+    func sendToDelegate(passover: Passover){
         if let delegate = delegate {
-            let location = CLLocation.init(latitude: tapCoordinates.latitude, longitude: tapCoordinates.longitude);
+            delegate.savedLocation(passover);
         }
     }
 }
