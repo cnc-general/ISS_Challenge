@@ -8,6 +8,7 @@
 
 import Foundation
 import CoreLocation
+import SQLite;
 
 private let name_key : String = "name";
 private let location_latitude_key : String = "location_lat";
@@ -100,13 +101,15 @@ class Passover : NSObject {
     //MARK: Static Methods
     
     static func savePassovers(passovers: [Passover]?){
-//        let defaults = NSUserDefaults.standardUserDefaults();
-//        defaults.setObject(passovers, forKey: "passovers");
-//        defaults.synchronize();
+        //TODO: Persistence
     }
     
     static func getPassovers() -> [Passover]?{
-        let defaults = NSUserDefaults.standardUserDefaults();
-        return defaults.objectForKey("passovers") as? [Passover];
+        //TODO: Persistence
+        return nil;
     }
+    
+    //MARK: SQLITE
+    
+    
 }
