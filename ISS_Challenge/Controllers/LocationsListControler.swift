@@ -12,7 +12,6 @@ import CoreLocation
 class LocationsListController: UIViewController, UITableViewDelegate, UITableViewDataSource, CLLocationManagerDelegate, NewLocationDelegate, PassoverDelegate {
     
     let _locationManager = CLLocationManager();
-    var _currentLocation : CLLocation? = CLLocation(latitude: 0,longitude: 0);
     var _locationType: NewLocationType = NewLocationType.Coordinates;
     
     var locations = [Passover]();
@@ -27,6 +26,8 @@ class LocationsListController: UIViewController, UITableViewDelegate, UITableVie
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        _locationsTableView.allowsSelection = false;
         
         formatter.dateFormat = "MM/dd/yyyy hh:mm:ss a";
 
@@ -53,36 +54,22 @@ class LocationsListController: UIViewController, UITableViewDelegate, UITableVie
             newLocationController.delegate = self;
             newLocationController.locationType = _locationType;
         }
+        if(segue.identifier == "MapSegue"){
+            let mapController = segue.destinationViewController as! MapController;
+            
+            mapController.locations = locations;
+        }
     }
 
 
     //MARK: Table View
 
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        if(_currentLocation != nil){
-            return 2;
-        }
-        else {
-            return 1;
-        }
-    }
-
-    func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        if(_currentLocation == nil || section == 1) {
-            return "Friends";
-        }
-        else{
-            return nil;
-        }
+        return 1;
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if(_currentLocation != nil && section == 0){
-            return 1;
-        }
-        else {
-            return locations.count;
-        }
+        return locations.count;
     }
 
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
@@ -92,36 +79,32 @@ class LocationsListController: UIViewController, UITableViewDelegate, UITableVie
             cell = UITableViewCell(style: UITableViewCellStyle.Subtitle, reuseIdentifier: "locationCell");
         }
 
-        if(_currentLocation != nil && indexPath.section == 0) {
-            cell!.textLabel!.text = "Current Location";
-            //TODO: Passover date;
-        }
-        else{
-            let passover = locations[indexPath.row];
-            cell!.textLabel!.text = passover.name;
-            
-            if(passover.date != nil){
-                cell!.detailTextLabel!.text = formatter.stringFromDate(passover.date!);
-            }
+        let passover = locations[indexPath.row];
+        cell!.textLabel!.text = passover.name;
+        
+        if(passover.date != nil){
+            cell!.detailTextLabel!.text = formatter.stringFromDate(passover.date!);
         }
 
         return cell!;
-    }
-
-    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) -> Void {
-
     }
     
     //MARK: Location Manager
 
     func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]){
         if(locations.count > 0){
-            _currentLocation = locations[0];
-            let reloadIndex = NSIndexPath(forRow: 0, inSection: 0)
-
-            _locationsTableView.beginUpdates();
-            _locationsTableView.reloadRowsAtIndexPaths([reloadIndex], withRowAnimation: UITableViewRowAnimation.Fade);
-            _locationsTableView.endUpdates();
+            
+            _locationManager.stopUpdatingLocation();
+            
+            let currentLocation = locations[0];
+            
+            let currentPassover = Passover(withName: "Current Location", location: currentLocation);
+            
+            self.locations.append(currentPassover);
+            
+            _locationsTableView.reloadData();
+            
+            currentPassover.getDateAsync(self);
         }
     }
 
@@ -132,24 +115,23 @@ class LocationsListController: UIViewController, UITableViewDelegate, UITableVie
         
         locations.append(passover)
         
-        let indexSet = NSMutableIndexSet();
+        _locationsTableView.reloadData();
         
-        if(_currentLocation != nil){
-            indexSet.addIndex(1);
-        }
-        else {
-            indexSet.addIndex(0);
-        }
-        
-        _locationsTableView.beginUpdates();
-        _locationsTableView.reloadSections(indexSet, withRowAnimation: UITableViewRowAnimation.Automatic);
-        _locationsTableView.endUpdates();
+        passover.getDateAsync(self);
     }
     
     //MARK: Passover Delegate
     
-    func passoverUpdatedDate() {
+    func passoverUpdatedDate(passover: Passover) {
+        _locationsTableView.reloadData();
         
+        if(passover.name == "Current Location"){
+            let notification = UILocalNotification();
+            notification.alertTitle = "ISS is passing over your current location!";
+            notification.fireDate = passover.date;
+            
+            UIApplication.sharedApplication().scheduleLocalNotification(notification);
+        }
     }
 
     //MARK: Actions
@@ -185,6 +167,10 @@ class LocationsListController: UIViewController, UITableViewDelegate, UITableVie
         newLocationSheet.addAction(mapAction);
 
         self.presentViewController(newLocationSheet, animated: true, completion: nil);
+    }
+    
+    @IBAction func showMap(sender: UIButton){
+        self.performSegueWithIdentifier("MapSegue", sender: self);
     }
 }
 

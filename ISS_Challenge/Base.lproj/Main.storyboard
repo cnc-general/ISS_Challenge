@@ -42,6 +42,16 @@
                         </variation>
                     </view>
                     <navigationItem key="navigationItem" id="APp-wd-zGH">
+                        <barButtonItem key="leftBarButtonItem" style="plain" id="xZ2-qU-rg2">
+                            <button key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="Oax-Nd-AJf">
+                                <rect key="frame" x="20" y="7" width="133" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Map"/>
+                                <connections>
+                                    <action selector="showMap:" destination="ERT-Il-UVe" eventType="touchUpInside" id="5P7-Ie-4Su"/>
+                                </connections>
+                            </button>
+                        </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="ivd-S9-Te0">
                             <connections>
                                 <action selector="addLocation:" destination="ERT-Il-UVe" id="3lO-Jg-U8t"/>
@@ -51,16 +61,17 @@
                     <connections>
                         <outlet property="_locationsTableView" destination="jsK-5a-dkE" id="Y5H-11-tBV"/>
                         <segue destination="k8U-ct-QPt" kind="show" identifier="NewSegue" id="8VB-hW-Vcb"/>
+                        <segue destination="evl-55-iA1" kind="show" identifier="MapSegue" id="5VS-Iv-neA"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="4eL-of-aQc" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="1373" y="124"/>
         </scene>
-        <!--View Controller-->
+        <!--Map Controller-->
         <scene sceneID="ZjD-cR-R85">
             <objects>
-                <viewController id="evl-55-iA1" sceneMemberID="viewController">
+                <viewController id="evl-55-iA1" customClass="MapController" customModule="ISS_Challenge" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="FRF-xu-fRQ"/>
                         <viewControllerLayoutGuide type="bottom" id="EWf-Zf-UDN"/>
@@ -68,8 +79,22 @@
                     <view key="view" contentMode="scaleToFill" id="AvE-VG-InW">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="G8G-0B-3rO">
+                                <rect key="frame" x="0.0" y="64" width="600" height="536"/>
+                            </mapView>
+                        </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="EWf-Zf-UDN" firstAttribute="top" secondItem="G8G-0B-3rO" secondAttribute="bottom" id="GQz-0G-3Du"/>
+                            <constraint firstAttribute="trailing" secondItem="G8G-0B-3rO" secondAttribute="trailing" id="TRS-09-XwG"/>
+                            <constraint firstItem="G8G-0B-3rO" firstAttribute="top" secondItem="FRF-xu-fRQ" secondAttribute="bottom" id="oaj-Ih-Sji"/>
+                            <constraint firstItem="G8G-0B-3rO" firstAttribute="leading" secondItem="AvE-VG-InW" secondAttribute="leading" id="seU-Bp-Waw"/>
+                        </constraints>
                     </view>
+                    <connections>
+                        <outlet property="mapView" destination="G8G-0B-3rO" id="1IK-fU-ac5"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="gzb-5s-ccN" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>

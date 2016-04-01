@@ -16,7 +16,7 @@ private let date_key : String = "date";
 private let id_key : String = "id";
 
 protocol PassoverDelegate {
-    func passoverUpdatedDate();
+    func passoverUpdatedDate(passover: Passover);
 }
 
 class Passover : NSObject {
@@ -109,13 +109,13 @@ class Passover : NSObject {
                 (data: NSData?) -> Void in
                 
                 if(data != nil){
-                    self.parseResponse(data!);
+                    self.parseResponse(data!, delegate: delegate);
                 }
             });
         }
     }
     
-    func parseResponse(data: NSData){
+    func parseResponse(data: NSData, delegate:PassoverDelegate){
         do {
             let JSON = try NSJSONSerialization.JSONObjectWithData(data, options:NSJSONReadingOptions(rawValue: 0))
             guard let JSONDictionary :NSDictionary = JSON as? NSDictionary else {
@@ -123,7 +123,28 @@ class Passover : NSObject {
                 // put in function
                 return
             }
-            print("JSONDictionary! \(JSONDictionary)")
+            
+            let response = JSONDictionary.objectForKey("response") as? NSArray;
+            if(response != nil){
+                
+                let pass = response?.objectAtIndex(0) as? NSDictionary;
+                if(pass != nil){
+                    
+                    let rise = pass?.objectForKey("risetime")
+                    var riseSeconds = rise as? Double;
+                    
+                    if(riseSeconds != nil){
+                        riseSeconds! /= 1000.0;
+                        self.date = NSDate(timeIntervalSinceNow: riseSeconds!);
+                        
+                        dispatch_async(dispatch_get_main_queue(), {
+                            delegate.passoverUpdatedDate(self);
+                        });
+                    }
+                }
+            }
+            
+            
         }
         catch let JSONError as NSError {
             print("\(JSONError)")

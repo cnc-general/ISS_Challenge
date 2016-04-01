@@ -12,7 +12,20 @@ import CoreLocation
 class WSCaller: NSObject {
     
     class func GetDate(location: CLLocation, completion: (NSData?) -> Void) {
-        if let request = restGetRequest(location){
+        let url = restGetPassoverURL(location);
+        
+        if let request = restGetRequest(url){
+            send(request, completion:completion);
+        }
+        else{
+            completion(nil);
+        }
+    }
+    
+    class func GetISS(completion: (NSData?) -> Void) {
+        let url = restGetISSURL();
+        
+        if let request = restGetRequest(url){
             send(request, completion:completion);
         }
         else{
@@ -30,11 +43,10 @@ class WSCaller: NSObject {
     }
     
     
-    class func restGetRequest(location: CLLocation) -> NSURLRequest? {
-        let restURL = restGetURL(location);
+    class func restGetRequest(url: NSURL) -> NSURLRequest? {
         
         let request = NSMutableURLRequest();
-        request.URL = restURL;
+        request.URL = url;
         request.addValue("application/json", forHTTPHeaderField: "Content-Type");
         request.addValue("application/json", forHTTPHeaderField: "Accept");
         
@@ -44,13 +56,18 @@ class WSCaller: NSObject {
     }
     
     
-    private class func restGetURL(location: CLLocation) -> NSURL {
+    private class func restGetPassoverURL(location: CLLocation) -> NSURL {
         var urlString = "http://api.open-notify.org/iss-pass.json?"
         
         urlString += "lat=" + String(location.coordinate.latitude);
         urlString += "&";
         urlString += "lon=" + String(location.coordinate.longitude);
         
+        return NSURL(string: urlString)!;
+    }
+    
+    private class func restGetISSURL() -> NSURL {
+        let urlString = "http://api.open-notify.org/iss-now.json"
         return NSURL(string: urlString)!;
     }
 }
