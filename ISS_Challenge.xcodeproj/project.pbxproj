@@ -15,6 +15,7 @@
 		A097A6831CADEDE400341CA4 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A097A6821CADEDE400341CA4 /* MapKit.framework */; };
 		A097A6851CADEDE900341CA4 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A097A6841CADEDE900341CA4 /* CoreLocation.framework */; };
 		A097A6D01CAEC89A00341CA4 /* MapController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A097A6CF1CAEC89A00341CA4 /* MapController.swift */; };
+		A097A6D21CAECA0E00341CA4 /* WSCaller.swift in Sources */ = {isa = PBXBuildFile; fileRef = A097A6D11CAECA0E00341CA4 /* WSCaller.swift */; };
 		DF2796B71024FE29BF9DDEF7 /* Passover.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF279899449F901124651424 /* Passover.swift */; };
 		DF279D3A43D933683BECFC08 /* LocationsListControler.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF2799337619D2A7144C31E0 /* LocationsListControler.swift */; };
 /* End PBXBuildFile section */
@@ -30,6 +31,7 @@
 		A097A6821CADEDE400341CA4 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
 		A097A6841CADEDE900341CA4 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		A097A6CF1CAEC89A00341CA4 /* MapController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapController.swift; sourceTree = "<group>"; };
+		A097A6D11CAECA0E00341CA4 /* WSCaller.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WSCaller.swift; sourceTree = "<group>"; };
 		DF279899449F901124651424 /* Passover.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Passover.swift; sourceTree = "<group>"; };
 		DF2799337619D2A7144C31E0 /* LocationsListControler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocationsListControler.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -101,6 +103,7 @@
 		DF279AA9E5702919D46488FA /* Web */ = {
 			isa = PBXGroup;
 			children = (
+				A097A6D11CAECA0E00341CA4 /* WSCaller.swift */,
 			);
 			path = Web;
 			sourceTree = "<group>";
@@ -188,6 +191,7 @@
 				A0898D0C1CADCBC100CEC9B5 /* AppDelegate.swift in Sources */,
 				DF279D3A43D933683BECFC08 /* LocationsListControler.swift in Sources */,
 				A097A6D01CAEC89A00341CA4 /* MapController.swift in Sources */,
+				A097A6D21CAECA0E00341CA4 /* WSCaller.swift in Sources */,
 				DF2796B71024FE29BF9DDEF7 /* Passover.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

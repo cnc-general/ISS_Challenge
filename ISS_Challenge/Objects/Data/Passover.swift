@@ -8,13 +8,16 @@
 
 import Foundation
 import CoreLocation
-import SQLite;
 
 private let name_key : String = "name";
 private let location_latitude_key : String = "location_lat";
 private let location_longitude_key : String = "location_lng";
 private let date_key : String = "date";
 private let id_key : String = "id";
+
+protocol PassoverDelegate {
+    func passoverUpdatedDate();
+}
 
 class Passover : NSObject {
 
@@ -98,18 +101,32 @@ class Passover : NSObject {
         self.location = location;
     }
     
-    //MARK: Static Methods
+    //MARK: Methods
     
-    static func savePassovers(passovers: [Passover]?){
-        //TODO: Persistence
+    func getDateAsync(delegate: PassoverDelegate){
+        if(self.location != nil){
+            WSCaller.GetDate(self.location!, completion:{
+                (data: NSData?) -> Void in
+                
+                if(data != nil){
+                    self.parseResponse(data!);
+                }
+            });
+        }
     }
     
-    static func getPassovers() -> [Passover]?{
-        //TODO: Persistence
-        return nil;
+    func parseResponse(data: NSData){
+        do {
+            let JSON = try NSJSONSerialization.JSONObjectWithData(data, options:NSJSONReadingOptions(rawValue: 0))
+            guard let JSONDictionary :NSDictionary = JSON as? NSDictionary else {
+                print("Not a Dictionary")
+                // put in function
+                return
+            }
+            print("JSONDictionary! \(JSONDictionary)")
+        }
+        catch let JSONError as NSError {
+            print("\(JSONError)")
+        }
     }
-    
-    //MARK: SQLITE
-    
-    
 }

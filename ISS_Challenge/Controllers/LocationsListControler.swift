@@ -9,7 +9,7 @@
 import UIKit
 import CoreLocation
 
-class LocationsListController: UIViewController, UITableViewDelegate, UITableViewDataSource, CLLocationManagerDelegate, NewLocationDelegate {
+class LocationsListController: UIViewController, UITableViewDelegate, UITableViewDataSource, CLLocationManagerDelegate, NewLocationDelegate, PassoverDelegate {
     
     let _locationManager = CLLocationManager();
     var _currentLocation : CLLocation? = CLLocation(latitude: 0,longitude: 0);
@@ -144,8 +144,12 @@ class LocationsListController: UIViewController, UITableViewDelegate, UITableVie
         _locationsTableView.beginUpdates();
         _locationsTableView.reloadSections(indexSet, withRowAnimation: UITableViewRowAnimation.Automatic);
         _locationsTableView.endUpdates();
+    }
+    
+    //MARK: Passover Delegate
+    
+    func passoverUpdatedDate() {
         
-        Passover.savePassovers(locations);
     }
 
     //MARK: Actions
